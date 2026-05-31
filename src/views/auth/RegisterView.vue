@@ -40,54 +40,62 @@
                             <h2>Hey, Hello!</h2>
                             <p>Enter your credentials to access your account</p>
                         </div>
-                        <form id="loginFormMain" >
-                            <!-- EMAIL -->
+                        <form id="loginFormMain">
+                            <!-- NAME -->
                             <div class="input-group-custom">
                                 <label>
                                     <i class="bi bi-person-circle"></i>
-                                    User Name 
+                                    Name
                                 </label>
-                                <input v-model="email" type="text" class="form-control" placeholder="hello@example.com">
-                                <!-- <p v-if="err.email" class="text-danger mt-1">
-                                    {{ err.email }}
-                                </p> -->
+
+                                <input v-model="form.name" type="text" class="form-control" placeholder="John Doe">
+
+                                <p v-if="err.name" class="text-danger mt-1">
+                                    {{ err.name }}
+                                </p>
                             </div>
-                            <!-- PASSWORD -->
+
+                            <!-- EMAIL -->
                             <div class="input-group-custom">
                                 <label>
-                                    <i class="bi bi-key"></i>
+                                    <i class="bi bi-envelope"></i>
                                     Email
                                 </label>
 
-                                <input v-model="password" type="password" class="form-control" placeholder="••••••••">
+                                <input v-model="form.email" type="email" class="form-control"
+                                    placeholder="hello@example.com">
 
-                                <!-- <p v-if="err.password" class="text-danger mt-1">
-                                    {{ err.password }}
-                                </p> -->
+                                <p v-if="err.email" class="text-danger mt-1">
+                                    {{ err.email }}
+                                </p>
                             </div>
+
+                            <!-- PASSWORD -->
                             <div class="input-group-custom">
                                 <label>
                                     <i class="bi bi-key"></i>
                                     Password
                                 </label>
 
-                                <input v-model="password" type="password" class="form-control" placeholder="••••••••">
+                                <div class="password-wrapper">
+                                    <input v-model="form.password" :type="showPassword ? 'text' : 'password'"
+                                        class="form-control" placeholder="••••••••" />
 
-                                <!-- <p v-if="err.password" class="text-danger mt-1">
+                                    <i class="bi" :class="showPassword ? 'bi-eye-slash' : 'bi-eye'"
+                                        @click="showPassword = !showPassword" style="cursor: pointer;"></i>
+                                </div>
+
+                                <p v-if="err.password" class="text-danger mt-1">
                                     {{ err.password }}
-                                </p> -->
+                                </p>
                             </div>
-                            <div class="forgot-link">
-                                <!-- <a href="#">Forgot Password?</a> -->
-                            </div>
-                            <!-- BUTTON -->
-                            <button  type="button" class="btn btn-login">
-                                <!-- <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span> -->
 
-                                <!-- {{ isLoading ? "Signing In..." : "Login" }} -->
-                                  Register
+                            <button type="button" class="btn btn-login" @click="handleRegister" :disabled="isLoading">
+                                <span v-if="isLoading" class="spinner-border spinner-border-sm me-2"></span>
 
-                                <!-- <i v-if="!isLoading" class="bi bi-arrow-right-short"></i> -->
+                                {{ isLoading ? "Registering..." : "Register" }}
+
+                                <i v-if="!isLoading" class="bi bi-arrow-right-short"></i>
                             </button>
                         </form>
                         <!-- DIVIDER -->
@@ -106,11 +114,82 @@
 </template>
 
 <script setup>
+import { reactive, ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { require, isEmail, isPassword, minlength, validates } from "@/utils/validate";
+import { notify } from "@/utils/toast";
 
+const authStore = useAuthStore();
+const router = useRouter();
+const showPassword = ref(false);
+const toast = notify(router);
+
+const isLoading = ref(false);
+
+const form = reactive({
+    name: "",
+    email: "",
+    password: ""
+});
+
+
+
+const err = reactive({
+    name: "",
+    email: "",
+    password: ""
+});
+
+function validate() {
+    err.name = validates(form.name, [
+        (v) => require(v, "Name is required."),
+    ])
+    err.email = validates(form.email, [
+        (v) => require(v, "Email is required."),
+        (v) => isEmail(v, "Please enter a valid email address.")
+    ])
+    err.password = validates(form.password, [
+        (v) => require(v, "Password is required."),
+        (v) => isPassword(v, "Password must contain at least one uppercase letter, one lowercase letter, and one number."),
+        (v) => minlength(v, 8, "Password must be at least 8 characters.")
+    ])
+
+    return !err.name && !err.email && !err.password;
+}
+
+
+async function handleRegister() {
+    if (!validate()) return;
+
+    isLoading.value = true;
+
+    try {
+        await authStore.register(
+            form.email,
+            form.password,
+            form.name
+        );
+
+        console.log("Registration successful");
+        toast.success("Registration successful! Please log in.", "/login");
+    } catch (error) {
+        if (error.response?.data?.message === "Email already registered") {
+            // err.email = "Email already registered";
+            toast.error("Email already registered. Please use a different email.");
+            return;
+        }
+
+        console.error("Registration failed:", error);
+        toast.error("Registration failed. Please try again.");
+    } finally {
+        isLoading.value = false;
+    }
+}
 </script>
 
-<style scoped>
 
+<style scoped>
 .body-login {
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, #f5f7fc 0%, #eef2f8 100%);
@@ -398,5 +477,18 @@
     right: 20px;
     z-index: 1100;
     min-width: 280px;
+}
+
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper i {
+  position: absolute;
+  right: 12px;
+  cursor: pointer;
+  color: #666;
 }
 </style>

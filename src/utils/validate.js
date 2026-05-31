@@ -34,3 +34,9 @@ export function validates(value, rules = []) {
     if (err) return err;
   }
 }
+
+export function minlength(value, min, message) {
+  return String(value).trim().length >= min ? "" : message;
+} 
+
+

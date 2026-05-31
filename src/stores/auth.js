@@ -38,6 +38,18 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const register = async (email, password, name) => {
+    try {
+      const res = await api.post("/api/register", { email, password, name });
+      // console.log(res.data);
+    
+      return res.data;
+      
+    } catch (err) {
+      throw new Error(err.response?.data?.message || "Registration failed");
+    }
+  };
+
   return {
     user,
     token,
@@ -46,5 +58,6 @@ export const useAuthStore = defineStore("auth", () => {
     logout,
     getMe,
     getMeStore,
+    register
   };
 });
