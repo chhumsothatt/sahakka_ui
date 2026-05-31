@@ -1,104 +1,111 @@
 <template>
     <div>
-    <main class="body-otp ">
-        <div class="verify-container">
-            <div class="row g-0 verify-card">
-                <!-- LEFT COLUMN: Sahakka branding + advantages (same style as reference) -->
-                <div class="col-lg-6 col-md-12">
-                    <div class="welcome-panel h-100 d-flex flex-column">
-                        <div class="brand-logo">
-                            <i class="bi bi-bezier2"></i> Sahakka
-                        </div>
-                        <div class="mt-auto">
-                            <h1 class="welcome-title">Welcome Back</h1>
-                            <div class="trial-badge">
-                                <i class="bi bi-gift-fill"></i> Let's get started with your 30 days free trial.
+        <main class="body-otp ">
+            <div class="verify-container">
+                <div class="row g-0 verify-card">
+                    <!-- LEFT COLUMN: Sahakka branding + advantages (same style as reference) -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="welcome-panel h-100 d-flex flex-column">
+                            <div class="brand-logo">
+                                <i class="bi bi-bezier2"></i> Sahakka
                             </div>
-                            <ul class="feature-list">
-                                <li><i class="bi bi-shield-check"></i> We provide all the advantages</li>
-                                <li><i class="bi bi-graph-up"></i> Simplify all your financial transactions</li>
-                                <li><i class="bi bi-laptop"></i> Without any further requirements</li>
-                                <li><i class="bi bi-clock-history"></i> 24/7 dedicated support</li>
-                            </ul>
-                            <div class="testimonial-quote">
-                                <i class="bi bi-quote"></i> Seamless experience across all platforms — trusted by
-                                10,000+ teams.
+                            <div class="mt-auto">
+                                <h1 class="welcome-title">Welcome Back</h1>
+                                <div class="trial-badge">
+                                    <i class="bi bi-gift-fill"></i> Let's get started with your 30 days free trial.
+                                </div>
+                                <ul class="feature-list">
+                                    <li><i class="bi bi-shield-check"></i> We provide all the advantages</li>
+                                    <li><i class="bi bi-graph-up"></i> Simplify all your financial transactions</li>
+                                    <li><i class="bi bi-laptop"></i> Without any further requirements</li>
+                                    <li><i class="bi bi-clock-history"></i> 24/7 dedicated support</li>
+                                </ul>
+                                <div class="testimonial-quote">
+                                    <i class="bi bi-quote"></i> Seamless experience across all platforms — trusted by
+                                    10,000+ teams.
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- RIGHT COLUMN: OTP VERIFICATION FORM -->
-                <div class="col-lg-6 col-md-12">
-                    <div class="form-panel">
-                        <!-- Join waitlist badge -->
-                        <div class="waitlist-badge" id="waitlistBadge">
-                            <i class="bi bi-envelope-paper"></i> Join The Waitlist For The Design System!
-                        </div>
-
-                        <div class="form-header">
-                            <h2>Verify OTP</h2>
-                            <p>Enter the 6-digit verification code sent to your email</p>
-                        </div>
-
-                        <!-- Email display (prefilled from endpoint data) -->
-                        <div class="input-group-custom">
-                            <label><i class="bi bi-envelope"></i> Email Address</label>
-                            <input type="email" class="form-control" id="emailField" value="Sphinxgod0+02@gmail.com"
-                                readonly style="background-color: #f8fafc;">
-                            <div class="form-text text-muted small mt-1">We sent a verification code to this email.
+                    <!-- RIGHT COLUMN: OTP VERIFICATION FORM -->
+                    <div class="col-lg-6 col-md-12">
+                        <div class="form-panel">
+                            <!-- Join waitlist badge -->
+                            <div class="waitlist-badge" id="waitlistBadge">
+                                <i class="bi bi-envelope-paper"></i> Join The Waitlist For The Design System!
                             </div>
-                        </div>
 
-                        <!-- OTP Input - 6 digits -->
-                        <label><i class="bi bi-shield-lock"></i> Verification Code</label>
-                        <div class="otp-digit-group" id="otpContainer">
-                            <input type="text" maxlength="1" class="otp-digit" id="otp1" inputmode="numeric"
-                                pattern="\d*">
-                            <input type="text" maxlength="1" class="otp-digit" id="otp2" inputmode="numeric"
-                                pattern="\d*">
-                            <input type="text" maxlength="1" class="otp-digit" id="otp3" inputmode="numeric"
-                                pattern="\d*">
-                            <input type="text" maxlength="1" class="otp-digit" id="otp4" inputmode="numeric"
-                                pattern="\d*">
-                            <input type="text" maxlength="1" class="otp-digit" id="otp5" inputmode="numeric"
-                                pattern="\d*">
-                            <input type="text" maxlength="1" class="otp-digit" id="otp6" inputmode="numeric"
-                                pattern="\d*">
-                        </div>
+                            <div class="form-header">
+                                <h2>Verify OTP</h2>
+                                <p>Enter the 6-digit verification code sent to your email</p>
+                            </div>
+                            <div class="input-group-custom">
+                                <label><i class="bi bi-envelope"></i> Email Address</label>
+                                <input type="email" v-model="email" class="form-control"
+                                    style="background-color: #f8fafc;">
+                                <div class="form-text text-muted small mt-1">We sent a verification code to this email.
+                                </div>
+                            </div>
+                            <div class="input-group-custom">
+                                <label><i class="bi bi-shield-lock"></i> Verification Code</label>
+                                <input type="number"  v-model="otp" class="form-control text-center"
+                                    style="background-color: #f8fafc;">
+                                <div class="form-text text-muted small mt-1">We sent a verification code to this email.
+                                </div>
+                            </div>
 
-                        <button class="btn btn-verify" id="verifyBtn">
-                            Verify & Continue <i class="bi bi-check-circle"></i>
-                        </button>
+                            <button class="btn btn-verify" @click="handleOtp" id="verifyBtn">
+                                Verify & Continue <i class="bi bi-check-circle"></i>
+                            </button>
 
-                        <div class="resend-link">
-                            <a id="resendOtpLink">⟳ Didn't receive code? Resend OTP</a>
-                        </div>
+                            <div class="resend-link">
+                                <a id="resendOtpLink">⟳ Didn't receive code? Resend OTP</a>
+                            </div>
 
-                        <div class="info-note">
-                            <i class="bi bi-info-circle-fill"></i> After verifying, you'll be redirected to your
-                            dashboard. The OTP expires in 10 minutes.
-                        </div>
+                            <div class="info-note">
+                                <i class="bi bi-info-circle-fill"></i> After verifying, you'll be redirected to your
+                                dashboard. The OTP expires in 10 minutes.
+                            </div>
 
-                        <div class="back-to-login">
-                            <i class="bi bi-arrow-left"></i> <a href="#" id="backToLoginLink">Back to Login</a>
-                        </div>
+                            <div class="back-to-login">
+                                <i class="bi bi-arrow-left"></i> <a href="#" id="backToLoginLink">Back to Login</a>
+                            </div>
 
-                        <div class="mt-3 text-center">
-                            <small class="text-muted">Demo: Use OTP <strong id="demoOtpHint">865092</strong> (from
-                                endpoint)</small>
+                            <div class="mt-3 text-center">
+                                <small class="text-muted">Demo: Use OTP <strong id="demoOtpHint">865092</strong> (from
+                                    endpoint)</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
     </div>
 
 </template>
 
 <script setup>
+import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
+import { ref } from 'vue';
+const auth = useAuthStore();
+const router = useRouter();
+const otp = ref("");
+const email = ref("")
+const handleOtp = async () => {
 
+    console.log(otp.value);
+    console.log(email.value);
+    try {
+        await auth.otp(email.value, otp.value);
+        router.push("/newpass");
+        console.log("opt success");
+        
+    } catch (error) {
+        alert(error.message);
+    }
+}
 </script>
 
 <style scoped>

@@ -66,7 +66,7 @@
                                 </p>
                             </div>
                             <div class="forgot-link">
-                                <a href="#">Forgot Password?</a>
+                                <router-link to="/reset">Forgot Password?</router-link>
                             </div>
                             <!-- BUTTON -->
                             <button :disabled="isLoading" type="submit" class="btn btn-login">

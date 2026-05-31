@@ -44,11 +44,11 @@
                             <p>Enter your email and we'll send you a link to reset your password</p>
                         </div>
 
-                        <form id="forgotPasswordForm">
+                        <form id="forgotPasswordForm" @submit.prevent="forgotPassword">
                             <div class="input-group-custom">
                                 <label><i class="bi bi-envelope"></i> Email address</label>
-                                <input type="email" class="form-control" id="resetEmail"
-                                    placeholder="chhumsothatt343+2@gmail.com" required>
+                                <input type="email" class="form-control" v-model="email" id="resetEmail"
+                                    placeholder="enter email" required>
                                 <div class="form-text text-muted small mt-1">We'll send a password reset link to this
                                     email.</div>
                             </div>
@@ -83,6 +83,23 @@
 </template>
 
 <script setup>
+    import { useAuthStore } from "@/stores/auth";
+    import router from "@/router";
+    import { ref } from "vue";
+    const auth = useAuthStore();
+
+    let email = ref("");
+
+    const forgotPassword =async ()=>{
+        console.log(email.value);
+        try {
+            await auth.forgotPassword(email.value);
+            alert("Reset password link sent to your email");
+            router.push("/otp");
+        } catch (error) {
+            alert(error.message);
+        }
+    }
 
 </script>
 

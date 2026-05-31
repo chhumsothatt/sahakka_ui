@@ -50,6 +50,23 @@ export const useAuthStore = defineStore("auth", () => {
     }
   };
 
+  const forgotPassword = async (email)=>{
+    try{
+      const res = await api.post("/api/forgot-password", { email });
+      return res.data;
+    }catch(err){
+      throw new Error(err.response?.data?.message || "Forgot password failed");
+    }
+  }
+  const otp = async (email, otp)=>{
+    try{
+      const res = await api.post("/api/verify-otp", { email, otp });
+      return res.data;
+    }catch(err){
+      throw new Error(err.response?.data?.message || "Otp verification failed");
+    }
+  }
+
   return {
     user,
     token,
@@ -58,6 +75,7 @@ export const useAuthStore = defineStore("auth", () => {
     logout,
     getMe,
     getMeStore,
-    register
+    register,
+    forgotPassword
   };
 });
