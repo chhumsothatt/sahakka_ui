@@ -106,16 +106,16 @@ import {
     validates
 } from "@/utils/validate";
 
+const auth = useAuthStore();
+const router = useRouter();
+const toast = notify(router);
+
 const email = ref("");
 const password = ref("");
 
-
 const isLoading = ref(false);
 
-const auth = useAuthStore();
-const router = useRouter();
 
-const toast = notify(router);
 
 const err = reactive({
     email: "",
@@ -138,10 +138,6 @@ function validate() {
 }
 
 async function handleLogin() {
-    console.log(email.value);
-    console.log(password.value);
-    
-    
     if (!validate()) return;
     isLoading.value = true;
     try {

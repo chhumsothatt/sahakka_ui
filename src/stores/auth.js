@@ -42,30 +42,49 @@ export const useAuthStore = defineStore("auth", () => {
     try {
       const res = await api.post("/api/register", { email, password, name });
       // console.log(res.data);
-    
+
       return res.data;
-      
+
     } catch (err) {
       throw new Error(err.response?.data?.message || "Registration failed");
     }
   };
 
-  const forgotPassword = async (email)=>{
-    try{
+  const forgotPassword = async (email) => {
+    try {
       const res = await api.post("/api/forgot-password", { email });
       return res.data;
-    }catch(err){
+    } catch (err) {
       throw new Error(err.response?.data?.message || "Forgot password failed");
     }
   }
-  const otp = async (email, otp)=>{
-    try{
+  const otp = async (email, otp) => {
+    try {
       const res = await api.post("/api/verify-otp", { email, otp });
       return res.data;
-    }catch(err){
+    } catch (err) {
       throw new Error(err.response?.data?.message || "Otp verification failed");
     }
   }
+const resetPassword = async (email, new_password, confirm_password) => {
+  // 1. Client-side check before the API call
+  if (new_password != confirm_password) {
+    throw new Error("Passwords do not match");
+  }
+
+  try {
+    const res = await api.post('/api/reset-password', { 
+      email, 
+      newpassword, 
+      confirmpassword 
+    });
+    return res.data;
+  } catch (err) {
+    const errorMessage = err.response?.data?.message || "Reset password failed";
+    console.error("Auth Service Error:", errorMessage);
+    throw new Error(errorMessage);
+  }
+};
 
   return {
     user,
@@ -76,6 +95,8 @@ export const useAuthStore = defineStore("auth", () => {
     getMe,
     getMeStore,
     register,
-    forgotPassword
+    forgotPassword,
+    otp,
+    resetPassword
   };
 });

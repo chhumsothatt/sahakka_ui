@@ -44,13 +44,15 @@
                                 <label><i class="bi bi-envelope"></i> Email Address</label>
                                 <input type="email" v-model="email" class="form-control"
                                     style="background-color: #f8fafc;">
+                                <span class="text-danger">{{ emailError }}</span>
                                 <div class="form-text text-muted small mt-1">We sent a verification code to this email.
                                 </div>
                             </div>
                             <div class="input-group-custom">
                                 <label><i class="bi bi-shield-lock"></i> Verification Code</label>
-                                <input type="number"  v-model="otp" class="form-control text-center"
+                                <input type="text" v-model="otp" class="form-control text-center"
                                     style="background-color: #f8fafc;">
+                                <span class="text-danger">{{ otpError }}</span>
                                 <div class="form-text text-muted small mt-1">We sent a verification code to this email.
                                 </div>
                             </div>
@@ -87,25 +89,55 @@
 
 <script setup>
 import { useAuthStore } from '@/stores/auth';
-import { useRouter } from 'vue-router';
 import { ref } from 'vue';
-const auth = useAuthStore();
-const router = useRouter();
-const otp = ref("");
-const email = ref("")
-const handleOtp = async () => {
+import { notify } from "@/utils/toast";
+import { useRouter } from "vue-router";
 
-    console.log(otp.value);
-    console.log(email.value);
-    try {
-        await auth.otp(email.value, otp.value);
-        router.push("/newpass");
-        console.log("opt success");
-        
-    } catch (error) {
-        alert(error.message);
+const router = useRouter();
+const toast = notify(router);
+
+const auth = useAuthStore();
+
+const otp = ref("");
+const email = ref("");
+const isLoading = ref(false);
+const emailError = ref("");
+const otpError = ref("");
+const handleOtp = async () => {
+    emailError.value = "";
+    otpError.value = "";
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const otpRegex = /^\d{6}$/;
+
+    if (!email.value.trim()) {
+        emailError.value = "Email is required";
+    } else if (!emailRegex.test(email.value.trim())) {
+        emailError.value = "Please enter a valid email address";
     }
-}
+
+    if (!otp.value.trim()) {
+        otpError.value = "OTP is required";
+    } else if (!otpRegex.test(otp.value.trim())) {
+        otpError.value = "Please enter a valid 6-digit OTP";
+    }
+
+    if (emailError.value || otpError.value) {
+        toast.error(emailError.value || otpError.value);
+        return;
+    }
+    try {
+        await auth.otp(
+            email.value.trim(),
+            otp.value.trim()
+        );
+        toast.success("OTP verified successfully", "/newpassword");
+    } catch (error) {
+        otpError.value =
+            error.message || "OTP verification failed";
+    }
+};
+
 </script>
 
 <style scoped>

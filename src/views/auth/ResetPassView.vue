@@ -44,36 +44,24 @@
                             <p>Enter your email and we'll send you a link to reset your password</p>
                         </div>
 
-                        <form id="forgotPasswordForm" @submit.prevent="forgotPassword">
+                        <form method="">
                             <div class="input-group-custom">
                                 <label><i class="bi bi-envelope"></i> Email address</label>
-                                <input type="email" class="form-control" v-model="email" id="resetEmail"
-                                    placeholder="enter email" required>
-                                <div class="form-text text-muted small mt-1">We'll send a password reset link to this
-                                    email.</div>
+                                <input type="text" class="form-control" v-model="email" placeholder="enter email">
+                                <span class="text-danger">{{ err.email }}</span>
+
                             </div>
 
-                            <button type="submit" class="btn btn-reset">
-                                Send Reset Link <i class="bi bi-send"></i>
+                            <button :disabled="isLoading" type="button" @click="forgotPassword" class="btn btn-reset">
+                                            <div v-if="isLoading" class="spinner-border" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <div v-else>
+                                                Sign In
+                                            </div>
                             </button>
                         </form>
 
-                        <!-- additional info note -->
-                        <div class="info-note">
-                            <i class="bi bi-info-circle-fill"></i> After requesting a reset, check your inbox. The link
-                            expires in 1 hour.
-                        </div>
-
-                        <div class="divider">OR</div>
-
-                        <!-- Back to Login link -->
-                        <div class="back-to-login">
-                            <i class="bi bi-arrow-left"></i> <a href="#" id="backToLoginLink">Back to Login</a>
-                        </div>
-
-                        <div class="mt-3 text-center">
-                            <small class="text-muted">Demo mode: any email works — mock reset email simulation</small>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -83,24 +71,52 @@
 </template>
 
 <script setup>
-    import { useAuthStore } from "@/stores/auth";
-    import router from "@/router";
-    import { ref } from "vue";
-    const auth = useAuthStore();
+import { reactive, ref } from "vue";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+import { notify } from "@/utils/toast";
+import {
+    require,
+    isEmail,
+    validates
+} from "@/utils/validate";
+const auth = useAuthStore();
+const router = useRouter();
+const toast = notify(router);
 
-    let email = ref("");
+const email = ref("");
+const isLoading = ref(false);
+const err = reactive({
+    email: ""
+});
 
-    const forgotPassword =async ()=>{
-        console.log(email.value);
-        try {
-            await auth.forgotPassword(email.value);
-            alert("Reset password link sent to your email");
-            router.push("/otp");
-        } catch (error) {
-            alert(error.message);
-        }
+const validate = () => {
+    err.email = validates(email.value, [
+        (v) => require(v, "Email is required"),
+        (v) => isEmail(v, "Wrong email format"),
+    ]);
+    return !err.email;
+};
+
+const forgotPassword = async () => {
+    if (!validate()) {
+        return;
     }
+    
 
+    try {
+        await auth.forgotPassword(email.value);
+        toast.success("Reset password link sent successfully", "/otp");
+    } catch (error) {
+        toast.error(
+
+            "Something went wrong"
+        );
+    }finally {
+        isLoading.value = false;
+    }
+};
+isLoading.value = false;
 </script>
 
 <style scoped>

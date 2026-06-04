@@ -9,7 +9,11 @@ const router = createRouter({
       name: "landing",
       component: () => import("../views/LandingView.vue"),
     },
-    ,
+    {
+      path: "/newpassword",
+      name: "newpassword",
+      component: () => import("../views/auth/newPassword.vue")
+    },
     {
       path: "/otp",
       name: "otp",
